@@ -1,0 +1,340 @@
+<title>Grill-Me UI Spec</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Condensed:wght@500;600&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap">
+<style>
+/* Layout: single reading column (~72ch) with a sticky section index on wide screens; tables and code scroll in place. */
+:root {
+  --bg: #f6f7f9;
+  --surface: #ffffff;
+  --fg: #1b1f27;
+  --muted: #5b6474;
+  --line: #dde1e8;
+  --accent: #2346b8;
+  --accent-soft: #e6ebfa;
+  --ok: #1f7a4d;
+  --ok-soft: #e3f3ea;
+  --code-bg: #eef0f4;
+  --f-display: "IBM Plex Sans Condensed", "Arial Narrow", system-ui, sans-serif;
+  --f-body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #12151b; --surface: #1a1e26; --fg: #e4e7ee; --muted: #9aa3b3; --line: #2c3240;
+    --accent: #8ea6ff; --accent-soft: #232c48; --ok: #6fd3a0; --ok-soft: #173327; --code-bg: #20252f;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #12151b; --surface: #1a1e26; --fg: #e4e7ee; --muted: #9aa3b3; --line: #2c3240;
+  --accent: #8ea6ff; --accent-soft: #232c48; --ok: #6fd3a0; --ok-soft: #173327; --code-bg: #20252f;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body {
+  background: var(--bg); color: var(--fg);
+  font-family: var(--f-body); font-size: 16px; line-height: 1.6;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 40px 80px;
+}
+.wrap { max-width: 1080px; margin: 0 auto; display: grid; grid-template-columns: 200px minmax(0, 1fr); gap: 48px; }
+nav.toc { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 24px); align-self: start; font-size: 13.5px; }
+nav.toc ol { list-style: none; padding: 0; margin: 0; display: grid; gap: 6px; }
+nav.toc a { color: var(--muted); text-decoration: none; }
+nav.toc a:hover, nav.toc a:focus-visible { color: var(--accent); }
+.toc-label { font-family: var(--f-display); text-transform: uppercase; letter-spacing: .08em; font-size: 12px; color: var(--muted); margin-bottom: 10px; }
+main { min-width: 0; max-width: 72ch; }
+header.doc { border-bottom: 1px solid var(--line); padding-bottom: 24px; margin-bottom: 8px; }
+.eyebrow { font-family: var(--f-display); text-transform: uppercase; letter-spacing: .1em; font-size: 12.5px; color: var(--accent); font-weight: 600; }
+h1 { font-family: var(--f-display); font-weight: 600; font-size: 2.4rem; line-height: 1.1; margin: 8px 0 12px; text-wrap: balance; }
+h2 { font-family: var(--f-display); font-weight: 600; font-size: 1.5rem; margin: 48px 0 12px; text-wrap: balance; scroll-margin-top: 24px; }
+h3 { font-family: var(--f-display); font-weight: 600; font-size: 1.12rem; margin: 28px 0 8px; }
+p { margin: 0 0 14px; }
+.meta { display: flex; flex-wrap: wrap; gap: 8px 20px; color: var(--muted); font-size: 14px; }
+.pill { display: inline-block; font-size: 12.5px; font-weight: 500; padding: 2px 10px; border-radius: 999px; background: var(--ok-soft); color: var(--ok); }
+code { font-family: var(--f-mono); font-size: .88em; background: var(--code-bg); padding: 1px 5px; border-radius: 4px; }
+pre { font-family: var(--f-mono); font-size: 13.5px; line-height: 1.55; background: var(--code-bg); padding: 14px 16px; border-radius: 6px; overflow-x: auto; margin: 0 0 16px; }
+pre code { background: none; padding: 0; font-size: inherit; }
+.table-wrap { overflow-x: auto; margin: 0 0 18px; border: 1px solid var(--line); border-radius: 6px; background: var(--surface); }
+table { border-collapse: collapse; width: 100%; font-size: 14.5px; }
+th, td { text-align: left; vertical-align: top; padding: 9px 12px; border-bottom: 1px solid var(--line); }
+tr:last-child td { border-bottom: none; }
+th { font-family: var(--f-display); font-weight: 600; font-size: 13px; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); background: var(--bg); }
+td.n { font-family: var(--f-mono); color: var(--muted); white-space: nowrap; font-variant-numeric: tabular-nums; }
+ol.features { list-style: none; counter-reset: f; padding: 0; margin: 0; display: grid; gap: 14px; }
+ol.features > li { counter-increment: f; display: grid; grid-template-columns: 2.2rem minmax(0, 1fr); gap: 12px; background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 14px 16px; }
+ol.features > li::before { content: counter(f); font-family: var(--f-display); font-weight: 600; font-size: 1.3rem; color: var(--accent); font-variant-numeric: tabular-nums; }
+ol.features h3 { margin: 0 0 4px; }
+ol.features ul { margin: 6px 0 0; padding-left: 18px; }
+ol.features li li { margin-bottom: 3px; }
+.slice { background: var(--accent-soft); border-radius: 6px; padding: 12px 16px; margin: 0 0 18px; font-size: 15px; }
+ul.plain { padding-left: 20px; }
+ul.plain li { margin-bottom: 4px; }
+.mermaid { background: var(--surface); border: 1px solid var(--line); }
+a { color: var(--accent); }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+@media (max-width: 820px) {
+  .wrap { grid-template-columns: minmax(0, 1fr); gap: 0; }
+  nav.toc { display: none; }
+  h1 { font-size: 1.9rem; }
+}
+</style>
+
+<div class="wrap">
+<nav class="toc" aria-label="Sections">
+  <div class="toc-label">Contents</div>
+  <ol>
+    <li><a href="#overview">Overview</a></li>
+    <li><a href="#architecture">Architecture</a></li>
+    <li><a href="#layout">Repo layout</a></li>
+    <li><a href="#features">The 10 features</a></li>
+    <li><a href="#protocol">HTTP &amp; SSE protocol</a></li>
+    <li><a href="#claude">Claude invocation</a></li>
+    <li><a href="#constants">Constants</a></li>
+    <li><a href="#decisions">Decision log</a></li>
+    <li><a href="#verified">Verified facts</a></li>
+    <li><a href="#out">Out of scope</a></li>
+  </ol>
+</nav>
+
+<main>
+<header class="doc">
+  <div class="eyebrow">Tracer-bullet specification</div>
+  <h1>Grill-Me UI</h1>
+  <p>A static chat page on the internal network. Each visitor gets a private, resumable grilling session about one project, run by a headless Claude Code process. The session ends with a filled-in template the user can download.</p>
+  <div class="meta"><span class="pill">Agreed</span><span>2026-10-20</span><span>Source: grilling session, Q1–Q21</span></div>
+</header>
+
+<h2 id="overview">Overview</h2>
+<ul class="plain">
+  <li><strong>Users:</strong> anyone who can reach the host on the internal network. There's no login, because the network is the access boundary.</li>
+  <li><strong>Identity:</strong> a random, persistent <code>user_id</code> cookie. Every tab in the same browser shares one session.</li>
+  <li><strong>Backend:</strong> Python standard library only. One long-lived <code>claude</code> subprocess per user, driven over stream-json on stdin and stdout. No Agent SDK and no PyPI dependencies.</li>
+  <li><strong>Frontend:</strong> one <code>index.html</code> with vanilla JS. Replies arrive over SSE and messages are sent with <code>POST</code>. Markdown is rendered with vendored <code>marked</code> and DOMPurify.</li>
+  <li><strong>Grill input:</strong> <code>project.md</code> (what is grilled) and <code>template.md</code> (what must be filled). Both live in a separate grill folder that also contains the vendored skill.</li>
+  <li><strong>Grill output:</strong> a filled template, shown as a card in the chat and downloadable as <code>.md</code>.</li>
+</ul>
+
+<h2 id="architecture">Architecture</h2>
+<pre class="mermaid">
+flowchart LR
+  B["Browser tabs<br/>index.html"] -- "GET /events (SSE)" --> S["server.py<br/>stdlib, asyncio"]
+  B -- "POST /message, /finish, /new" --> S
+  S -- "stdin: stream-json" --> C["claude -p<br/>1 process per user<br/>cwd = grill/"]
+  C -- "stdout: stream-json" --> S
+  S --- D[("data/<br/>sessions.json<br/>transcripts/<br/>outputs/")]
+  C --- K[("~/.claude/projects/<br/>session files<br/>used by --resume")]
+</pre>
+<p>The server keeps an in-memory registry <code>{user_id: GrillSession}</code>. A <code>GrillSession</code> owns one subprocess, its <code>busy</code> flag and deadline, and the set of SSE streams attached to it. Everything that has to survive a restart is on disk.</p>
+
+<h2 id="layout">Repo layout</h2>
+<pre><code>app/
+  server.py                 # --host 0.0.0.0 --port 8000 --grill-dir ./grill
+  static/
+    index.html
+    vendor/
+      marked-12.0.2.min.js  # fetched once at setup, committed
+      purify-3.1.6.min.js
+  data/                     # runtime state, not committed
+    sessions.json           # user_id → session_id (written atomically)
+    transcripts/&lt;user_id&gt;.jsonl
+    outputs/&lt;user_id&gt;.md
+grill/                      # cwd of every claude subprocess
+  .claude/skills/grilling/SKILL.md   # vendored + adapted
+  project.md
+  template.md</code></pre>
+<p>Vendoring is a one-time setup step, run on a machine with internet access:</p>
+<pre><code>curl -o app/static/vendor/marked-12.0.2.min.js https://cdn.jsdelivr.net/npm/marked@12.0.2/marked.min.js
+curl -o app/static/vendor/purify-3.1.6.min.js  https://cdn.jsdelivr.net/npm/dompurify@3.1.6/dist/purify.min.js</code></pre>
+<p>If the download isn't possible, swap in a hand-written mini renderer (bold, italics, <code>---</code>, lists, inline code; escapes HTML first). The page falls back to escaped plain text whenever <code>window.marked</code> is missing.</p>
+
+<h2 id="features">The 10 features</h2>
+<p>These are listed in build order. Each step leaves something you can run.</p>
+<div class="slice"><strong>Thinnest end-to-end slice:</strong> features 1, 2, 4 and 5 together, with no persistence and no template. Get this working first, then add 6–10 one at a time.</div>
+<ol class="features">
+  <li><div>
+    <h3>Stdlib server skeleton</h3>
+    <ul>
+      <li><code>server.py --host 0.0.0.0 --port 8000 --grill-dir ./grill</code> serves <code>static/</code>.</li>
+      <li>On the first visit it sets a persistent random <code>user_id</code> cookie: <code>HttpOnly</code>, <code>SameSite=Lax</code>, <code>Max-Age</code> of about 1 year.</li>
+      <li>No login.</li>
+    </ul>
+  </div></li>
+  <li><div>
+    <h3>One long-lived <code>claude</code> process per user</h3>
+    <ul>
+      <li>Spawned lazily when a user's first tab attaches. <code>cwd</code> is the grill folder. The flags are in <a href="#claude">Claude invocation</a>.</li>
+      <li>A new user gets a hidden kickoff, sent but never shown or logged: <code>/grilling</code> plus the contents of <code>project.md</code> and <code>template.md</code>, with the rule that the grill isn't done until every template section can be filled from the user's answers.</li>
+    </ul>
+  </div></li>
+  <li><div>
+    <h3>Vendored, adapted grilling skill</h3>
+    <ul>
+      <li>Lives in <code>grill/.claude/skills/grilling/SKILL.md</code>.</li>
+      <li>Asks <strong>one question per turn</strong>, each ending with a <code>➡️</code> recommendation line.</li>
+      <li>Treats the template's sections as branches the grill must visit.</li>
+      <li>When every section is covered and the user confirms alignment, it outputs the filled template between <code>&lt;&lt;&lt;FILLED_TEMPLATE</code> and <code>FILLED_TEMPLATE&gt;&gt;&gt;</code>.</li>
+    </ul>
+  </div></li>
+  <li><div>
+    <h3>Transcript and fan-out</h3>
+    <ul>
+      <li>Every visible message is appended to <code>data/transcripts/&lt;user_id&gt;.jsonl</code>.</li>
+      <li>Each tab opens one SSE stream, which first replays the transcript and then receives live entries.</li>
+      <li>User messages arrive with <code>POST</code> and are broadcast to all of that user's tabs, so all tabs stay identical.</li>
+    </ul>
+  </div></li>
+  <li><div>
+    <h3>Chat UI</h3>
+    <ul>
+      <li>One <code>index.html</code> with vanilla JS and whole-message bubbles. There's no token streaming.</li>
+      <li>Markdown rendered with <code>marked</code> and sanitised with DOMPurify. If those are missing, it falls back to escaped plain text.</li>
+    </ul>
+  </div></li>
+  <li><div>
+    <h3>Turn control</h3>
+    <ul>
+      <li>Per-session <code>busy</code> flag. While it's set, every tab shows “Claude is thinking… 4:12 left”, counting down from a server-sent <code>deadline</code> so tabs opened mid-turn show the same countdown.</li>
+      <li>Input, <em>Finish</em> and <em>New grill</em> are disabled while busy. A stray <code>POST</code> gets <code>409 Busy</code>.</li>
+      <li>When <code>TURN_TIMEOUT_S</code> (5 minutes) expires, the process is killed and an error card appears.</li>
+    </ul>
+  </div></li>
+  <li><div>
+    <h3>Restart survival</h3>
+    <ul>
+      <li>When the <code>system/init</code> event reports a <code>session_id</code>, it's saved to <code>data/sessions.json</code> (write to a temp file, then <code>os.replace</code>).</li>
+      <li>If a tab arrives and that user has no live process, the backend spawns one with <code>--resume &lt;session_id&gt;</code> and no kickoff. This covers server restarts, crashes and the idle reaper.</li>
+    </ul>
+  </div></li>
+  <li><div>
+    <h3>Template fill and download</h3>
+    <ul>
+      <li>Two ways to trigger it: Claude emits the markers on its own, or the user presses <strong>Finish &amp; fill template</strong>, which sends a hidden message telling Claude to fill the template now and mark sections without material as “<em>not yet discussed</em>”.</li>
+      <li>The backend extracts the document between the markers, saves it to <code>data/outputs/&lt;user_id&gt;.md</code>, and logs it as a <code>document</code> entry, shown as a “📄 Filled template” card with a <strong>Download .md</strong> button (<code>GET /download</code>).</li>
+      <li>The chat stays open afterwards. Filling again overwrites the file and adds a new card.</li>
+    </ul>
+  </div></li>
+  <li><div>
+    <h3>Error handling</h3>
+    <ul>
+      <li>Triggers: the process exits, a <code>result</code> event has <code>is_error</code> (not logged in, usage limit), or the turn times out.</li>
+      <li>Shows a red error card with the message text. Error cards are sent live and <strong>never</strong> logged to the transcript.</li>
+      <li><code>busy</code> is cleared, and the user's next message respawns the process lazily with <code>--resume</code>.</li>
+      <li>If the resume itself fails, the card says the session can't be restored and offers to start a new grill. There are no automatic retries.</li>
+    </ul>
+  </div></li>
+  <li><div>
+    <h3>Lifecycle and limits</h3>
+    <ul>
+      <li><strong>New grill</strong> opens an in-page confirmation dialog. It says plainly that the current transcript and filled template will be deleted permanently.
+        <ul>
+          <li>If an output exists, the dialog shows <em>Download current output</em> above <em>Cancel</em> and <em>Wipe &amp; start new grill</em>.</li>
+          <li>If no output exists, the dialog says so and suggests pressing <em>Finish &amp; fill template</em> first.</li>
+        </ul>
+      </li>
+      <li>Confirming kills the process, deletes the user's <code>sessions.json</code> entry, transcript and output, and starts again with the kickoff.</li>
+      <li>The idle reaper kills a process after <code>IDLE_TIMEOUT_S</code> with no attached tabs. Nothing is deleted, and the session resumes lazily.</li>
+      <li>The cap is <code>MAX_LIVE_PROCESSES</code>. Beyond it, a new visitor sees “Server busy, try again shortly”.</li>
+    </ul>
+  </div></li>
+</ol>
+
+<h2 id="protocol">HTTP &amp; SSE protocol</h2>
+<p>The route and event names below are proposed. The behaviour behind them is agreed.</p>
+<div class="table-wrap"><table>
+  <thead><tr><th>Route</th><th>Purpose</th></tr></thead>
+  <tbody>
+    <tr><td><code>GET /</code></td><td>Serves <code>index.html</code> and sets the <code>user_id</code> cookie if it's missing.</td></tr>
+    <tr><td><code>GET /static/…</code></td><td>Static files, including the vendored libraries.</td></tr>
+    <tr><td><code>GET /events</code></td><td>SSE stream. Attaches the tab, spawns or resumes the process if needed, replays the transcript, then streams live entries. Returns <code>503</code> with “Server busy” when the cap is reached.</td></tr>
+    <tr><td><code>POST /message</code></td><td>Body <code>{text}</code>. Returns <code>409</code> if busy. Otherwise it logs and broadcasts the user message and writes it to stdin.</td></tr>
+    <tr><td><code>POST /finish</code></td><td>Sends the hidden “fill the template now” message. Returns <code>409</code> if busy.</td></tr>
+    <tr><td><code>POST /new</code></td><td>Kills the process, wipes the user's state and starts again with the kickoff.</td></tr>
+    <tr><td><code>GET /download</code></td><td><code>outputs/&lt;user_id&gt;.md</code> with <code>Content-Disposition: attachment</code>. Returns <code>404</code> if there's no output.</td></tr>
+  </tbody>
+</table></div>
+<div class="table-wrap"><table>
+  <thead><tr><th>SSE event</th><th>Payload</th><th>Logged?</th></tr></thead>
+  <tbody>
+    <tr><td><code>message</code></td><td><code>{role: "user" | "assistant", text, ts}</code></td><td>Yes</td></tr>
+    <tr><td><code>document</code></td><td><code>{markdown, ts}</code>, the filled template card</td><td>Yes</td></tr>
+    <tr><td><code>status</code></td><td><code>{state: "thinking", deadline}</code> or <code>{state: "idle"}</code></td><td>No</td></tr>
+    <tr><td><code>error</code></td><td><code>{text, can_resume}</code></td><td>No</td></tr>
+  </tbody>
+</table></div>
+
+<h2 id="claude">Claude invocation</h2>
+<pre><code># new user (followed by the hidden kickoff on stdin)
+claude -p --input-format stream-json --output-format stream-json --verbose \
+       --setting-sources project --tools ""
+
+# returning user, no live process
+claude -p --resume &lt;session_id&gt; --input-format stream-json --output-format stream-json --verbose \
+       --setting-sources project --tools ""</code></pre>
+<p>Each stdin line is <code>{"type":"user","message":{"role":"user","content":"…"}}</code>. On stdout, read <code>system/init</code> for <code>session_id</code>, <code>assistant</code> events for the reply text, and <code>result</code> for the end of the turn and <code>is_error</code>.</p>
+<p><code>--setting-sources project</code> ignores the host user's personal <code>~/.claude</code> config but still loads <code>grill/.claude/skills</code>. <code>--tools ""</code> means the session can't stall on a permission prompt or touch the server.</p>
+
+<h2 id="constants">Constants</h2>
+<div class="table-wrap"><table>
+  <thead><tr><th>Name</th><th>Value</th><th>Meaning</th></tr></thead>
+  <tbody>
+    <tr><td><code>TURN_TIMEOUT_S</code></td><td class="n">300</td><td>Longest a single turn may take. Shown as a countdown in the UI.</td></tr>
+    <tr><td><code>IDLE_TIMEOUT_S</code></td><td class="n">1800</td><td>How long a process with no attached tabs lives before it's reaped.</td></tr>
+    <tr><td><code>MAX_LIVE_PROCESSES</code></td><td class="n">5</td><td>Cap on concurrent <code>claude</code> processes.</td></tr>
+    <tr><td>Cookie <code>Max-Age</code></td><td class="n">≈1 year</td><td>Lifetime of the persistent <code>user_id</code> cookie.</td></tr>
+  </tbody>
+</table></div>
+
+<h2 id="decisions">Decision log</h2>
+<div class="table-wrap"><table>
+  <thead><tr><th>#</th><th>Question</th><th>Decision</th></tr></thead>
+  <tbody>
+    <tr><td class="n">Q1</td><td>Audience and hosting</td><td>Anyone on the internal network. No login.</td></tr>
+    <tr><td class="n">Q2</td><td>Concurrent visitors</td><td>One isolated session per user. Every tab of that user attaches to it.</td></tr>
+    <tr><td class="n">Q3</td><td>User identity</td><td>Random persistent cookie.</td></tr>
+    <tr><td class="n">Q4</td><td>Bridge to Claude Code</td><td><code>claude -p</code> stream-json subprocess. No SDK, which may not be installable on the internal network.</td></tr>
+    <tr><td class="n">Q5</td><td>Dependencies</td><td>Stdlib only. SSE plus POST.</td></tr>
+    <tr><td class="n">Q6</td><td>Project context</td><td>A single <code>project.md</code>. No codebase exploration.</td></tr>
+    <tr><td class="n">Q7</td><td>Skill loading</td><td>Project-local skill, started with an explicit <code>/grilling</code>. No tools, project settings only.</td></tr>
+    <tr><td class="n">Q8</td><td>Process lifetime</td><td>Long-lived, and resumable after a restart.</td></tr>
+    <tr><td class="n">Q9</td><td>Replay source</td><td>The app's own transcript JSONL per user.</td></tr>
+    <tr><td class="n">Q10</td><td>Streaming</td><td>Whole messages.</td></tr>
+    <tr><td class="n">Q11</td><td>Markdown</td><td>Vendored <code>marked</code> and DOMPurify. Hand-written renderer as fallback.</td></tr>
+    <tr><td class="n">Q12</td><td>End of session</td><td>A filled template, shown and downloadable.</td></tr>
+    <tr><td class="n">Q13</td><td>Template role</td><td>Loaded at kickoff and steers the grill.</td></tr>
+    <tr><td class="n">Q14</td><td>Fill trigger</td><td>Claude's markers or a Finish button. Gaps are marked “not yet discussed”.</td></tr>
+    <tr><td class="n">Q15</td><td>Display and format</td><td>A chat card with a <code>.md</code> download.</td></tr>
+    <tr><td class="n">Q16</td><td>After the fill</td><td>Chat continues and a new fill overwrites the old one. <em>New grill</em> resets.</td></tr>
+    <tr><td class="n">Q17</td><td>Busy state</td><td>Locked across tabs, <code>409</code> on <code>POST</code>, user messages broadcast.</td></tr>
+    <tr><td class="n">Q18</td><td>Failures</td><td>Error cards and lazy resume. 5-minute turn timeout with a visible countdown.</td></tr>
+    <tr><td class="n">Q19</td><td>Limits</td><td>Idle reaper (30 minutes) and a cap of 5 processes.</td></tr>
+    <tr><td class="n">Q20</td><td>Layout</td><td>App and grill folder kept separate.</td></tr>
+    <tr><td class="n">Q21</td><td>Question style</td><td>One question per turn. No Accept button.</td></tr>
+  </tbody>
+</table></div>
+
+<h2 id="verified">Verified facts</h2>
+<p>All tested on the development machine with Claude Code 2.1.303 and Python 3.12.3 on 2026-10-19:</p>
+<ul class="plain">
+  <li>A skill in <code>&lt;cwd&gt;/.claude/skills/</code> runs headless when started with an explicit <code>/name</code>, even with <code>--tools ""</code> and <code>--setting-sources project</code>. When the model has to decide to use it, it needs the <code>Skill</code> tool, and without that tool it didn't trigger.</li>
+  <li>A stream-json session that exited could be resumed in a new long-lived stream-json process with <code>--resume &lt;session_id&gt;</code>. The <code>session_id</code> stayed the same and the context was kept: the resumed process recalled a secret word from before the restart.</li>
+  <li>PyPI and jsdelivr are both reachable from the development machine. Whether the target host can reach them is unknown, which is why the design is stdlib only with vendored files.</li>
+</ul>
+
+<h2 id="out">Out of scope for the tracer bullet</h2>
+<ul class="plain">
+  <li>Token-by-token streaming (first upgrade candidate)</li>
+  <li>An “Accept recommendation” button</li>
+  <li>A live document panel that fills while the grill runs</li>
+  <li>More than one project or grill folder</li>
+  <li>Export formats other than <code>.md</code>, and a transcript download</li>
+  <li>Login or shared passwords</li>
+  <li>Automatic retries</li>
+  <li>Moving one session between devices or browsers</li>
+  <li>Codebase exploration by the grilling session</li>
+</ul>
+</main>
+</div>
