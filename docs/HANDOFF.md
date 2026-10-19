@@ -23,7 +23,9 @@ The source is the `grilling` skill from Matt Pocock's skills plugin (MIT licence
 ~/.claude/plugins/cache/mattpocock/mattpocock-skills/1.2.3/skills/productivity/grilling/SKILL.md
 ```
 
-Copy it to `grill/.claude/skills/grilling/SKILL.md`, keep its frontmatter `name: grilling`, and put a line under the frontmatter crediting the source and the MIT licence. Then make these changes:
+Upstream: https://github.com/mattpocock/skills
+
+Copy it to `grill/.claude/skills/grilling/SKILL.md` and keep its frontmatter `name: grilling`. **Credit is mandatory:** put an HTML comment under the frontmatter saying it is adapted from Matt Pocock's `grilling` skill (with the upstream link), and copy the upstream `LICENSE` file to `grill/.claude/skills/grilling/LICENSE` unchanged. Don't remove the credits section from `README.md`. Then make these changes:
 
 | Original behaviour | Adapted behaviour |
 |---|---|
